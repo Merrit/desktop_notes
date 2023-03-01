@@ -1,7 +1,6 @@
 import 'package:desktop_notes/src/src.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:window_manager/window_manager.dart';
 
 /// Widget that displays a text field for taking notes.
 class NotesWidget extends StatelessWidget {
@@ -17,14 +16,10 @@ class NotesWidget extends StatelessWidget {
     final width = mediaQuery.size.width;
     final height = mediaQuery.size.height;
 
-    return BlocProvider(
-      create: (context) => NotesCubit(),
-      lazy: false,
-      child: SizedBox(
-        width: width,
-        height: height,
-        child: const _NotesView(),
-      ),
+    return SizedBox(
+      width: width,
+      height: height,
+      child: const _NotesView(),
     );
   }
 }
@@ -192,98 +187,11 @@ class NoteWidgetContents extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: const [
-        NoteHeader(),
         Expanded(
           child: NoteBody(),
         ),
+        NoteActionsBar(),
       ],
-    );
-  }
-}
-
-class NoteHeader extends StatefulWidget {
-  const NoteHeader({super.key});
-
-  @override
-  State<NoteHeader> createState() => _NoteHeaderState();
-}
-
-class _NoteHeaderState extends State<NoteHeader> {
-  final focusNode = FocusNode();
-  final textController = TextEditingController();
-
-  @override
-  void initState() {
-    textController.text = NotesCubit.instance.state.selectedNote.title;
-
-    // When the focus node loses focus, update the note title.
-    focusNode.addListener(() {
-      if (!focusNode.hasFocus) {
-        final note = NotesCubit.instance.state.selectedNote;
-        NotesCubit.instance.update(
-          note.copyWith(title: textController.text),
-        );
-      }
-    });
-
-    super.initState();
-  }
-
-  bool hovered = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => hovered = true),
-      onExit: (_) => setState(() => hovered = false),
-      cursor: (hovered) ? SystemMouseCursors.move : MouseCursor.defer,
-      child: GestureDetector(
-        behavior: HitTestBehavior.translucent,
-        onPanStart: (_) => windowManager.startDragging(),
-        onTapUp: (_) => AppWindow.instance.saveWindowSize(),
-        onDoubleTap: () async {
-          bool isMaximized = await windowManager.isMaximized();
-          if (!isMaximized) {
-            windowManager.maximize();
-          } else {
-            windowManager.unmaximize();
-          }
-        },
-        child: SizedBox(
-          height: 56,
-          child: Row(
-            // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              IntrinsicWidth(
-                child: BlocBuilder<NotesCubit, NotesState>(
-                  builder: (context, state) {
-                    return TextField(
-                      focusNode: focusNode,
-                      controller: textController,
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: 'Title',
-                        hintStyle: TextStyle(
-                          color: Colors.grey,
-                          fontStyle: FontStyle.italic,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              const Spacer(),
-              // Reserved space to ensure there is room where the window
-              // can be grabbed and moved, and the title doesn't overlap.
-              const SizedBox(width: 64),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () => AppWindow.instance.close(),
-              ),
-            ],
-          ),
-        ),
-      ),
     );
   }
 }
@@ -320,25 +228,18 @@ class _NoteBodyState extends State<NoteBody> {
   Widget build(BuildContext context) {
     return BlocBuilder<NotesCubit, NotesState>(
       builder: (context, state) {
-        return Column(
-          children: [
-            Expanded(
-              child: TextField(
-                focusNode: focusNode,
-                controller: textController,
-                maxLines: null,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'New note...',
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                    fontStyle: FontStyle.italic,
-                  ),
-                ),
-              ),
+        return TextField(
+          focusNode: focusNode,
+          controller: textController,
+          maxLines: null,
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+            hintText: 'New note...',
+            hintStyle: TextStyle(
+              color: Colors.grey,
+              fontStyle: FontStyle.italic,
             ),
-            const NoteActionsBar(),
-          ],
+          ),
         );
       },
     );
