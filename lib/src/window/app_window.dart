@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../logs/logging_manager.dart';
@@ -17,6 +18,21 @@ class AppWindow {
 
   static Future<AppWindow> init() async {
     await windowManager.ensureInitialized();
+
+    const windowOptions = WindowOptions(
+      title: 'Desktop Notes',
+      size: Size(500, 500),
+      skipTaskbar: true,
+      titleBarStyle: TitleBarStyle.hidden,
+    );
+
+    await windowManager.waitUntilReadyToShow(
+      windowOptions,
+      () async {
+        await windowManager.show();
+      },
+    );
+
     return AppWindow._();
   }
 
