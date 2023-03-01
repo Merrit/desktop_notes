@@ -15,9 +15,9 @@ class App extends StatelessWidget {
           theme: state.themeData,
           routes: {
             NotesWidget.id: (context) => const NotesWidget(),
-            WidgetWrapper.id: (context) => const WidgetWrapper(),
+            HomePage.id: (context) => const HomePage(),
           },
-          home: const WidgetWrapper(),
+          home: const HomePage(),
         );
       },
     );
