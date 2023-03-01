@@ -84,6 +84,7 @@ class _CustomAppBarState extends State<_CustomAppBar> {
         actions: [
           IconButton(
             icon: const Icon(Icons.close),
+            tooltip: 'Close',
             onPressed: () => AppWindow.instance.close(),
           ),
         ],

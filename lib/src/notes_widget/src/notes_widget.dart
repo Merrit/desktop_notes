@@ -94,6 +94,7 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
         children: [
           IconButton(
             icon: const Icon(Icons.add),
+            tooltip: 'Add note',
             padding: const EdgeInsets.symmetric(horizontal: 16),
             onPressed: () {
               NotesCubit.instance.create();
@@ -103,6 +104,7 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
             icon: (expanded)
                 ? const Icon(Icons.arrow_back_ios_rounded)
                 : const Icon(Icons.arrow_forward_ios_rounded),
+            tooltip: (expanded) ? 'Collapse' : 'Expand',
             padding: const EdgeInsets.symmetric(horizontal: 16),
             onPressed: () {
               setState(() {
