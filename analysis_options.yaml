@@ -1,0 +1,8 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  exclude:
+    - "**.freezed.dart"
+    - "**.g.dart"
+    - "**.gr.dart"
+    - "**/generated_plugin_registrant.dart"
