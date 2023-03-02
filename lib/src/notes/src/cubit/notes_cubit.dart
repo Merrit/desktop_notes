@@ -55,7 +55,7 @@ class NotesCubit extends Cubit<NotesState> {
     final note = Note.newNote();
 
     emit(state.copyWith(
-      notes: [...state.notes, note],
+      notes: [note, ...state.notes],
       selectedNote: note,
     ));
 
