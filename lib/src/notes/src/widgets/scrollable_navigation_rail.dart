@@ -89,6 +89,16 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
                         children: [
                           ...state.notes.map(
                             (Note note) {
+                              // Color circle with the note's color.
+                              final Widget colorCircle = Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: Color(note.color),
+                                  shape: BoxShape.circle,
+                                ),
+                              );
+
                               String titleText;
                               if (note.title == '') {
                                 titleText = 'Title';
@@ -112,7 +122,7 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
                               }
 
                               return ListTile(
-                                leading: const Icon(Icons.notes),
+                                leading: colorCircle,
                                 title: titleWidget,
                                 selected: note.id == state.selectedNote.id,
                                 onTap: () {

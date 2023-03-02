@@ -8,6 +8,7 @@ import '../src.dart';
 class NotesDatabase {
   static const _databaseName = 'notes.db';
   static const _tableName = 'notes';
+  static const _columnColor = 'color';
   static const _columnId = 'id';
   static const _columnTitle = 'title';
   static const _columnText = 'text';
@@ -29,6 +30,7 @@ class NotesDatabase {
     // create the table
     await database.execute('''
 CREATE TABLE IF NOT EXISTS $_tableName (
+  $_columnColor INTEGER NOT NULL,
   $_columnId TEXT PRIMARY KEY,
   $_columnTitle TEXT NOT NULL,
   $_columnText TEXT NOT NULL

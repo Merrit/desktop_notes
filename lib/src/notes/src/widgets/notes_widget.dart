@@ -139,14 +139,32 @@ class NoteActionsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.end,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         IconButton(
+          tooltip: 'Change color',
+          icon: const Icon(Icons.color_lens),
+          onPressed: () async => await _showColorPickerDialog(context),
+        ),
+        IconButton(
+          tooltip: 'Delete note',
           icon: const Icon(Icons.delete),
           onPressed: () => _showDeleteDialog(context),
         ),
       ],
     );
+  }
+
+  Future<void> _showColorPickerDialog(BuildContext context) async {
+    final result = await showDialog<Color>(
+      context: context,
+      builder: (context) => const ColorPickerDialog(),
+    );
+
+    if (result != null) {
+      final note = NotesCubit.instance.state.selectedNote;
+      NotesCubit.instance.update(note.copyWith(color: result.value));
+    }
   }
 
   /// Display a dialog to confirm the deletion of the note.
@@ -176,5 +194,81 @@ class NoteActionsBar extends StatelessWidget {
     if (result == true) {
       NotesCubit.instance.delete(note);
     }
+  }
+}
+
+/// A dialog that allows the user to select a color for the note.
+class ColorPickerDialog extends StatefulWidget {
+  const ColorPickerDialog({
+    super.key,
+  });
+
+  @override
+  State<ColorPickerDialog> createState() => _ColorPickerDialogState();
+}
+
+class _ColorPickerDialogState extends State<ColorPickerDialog> {
+  late Color selectedColor;
+
+  @override
+  void initState() {
+    selectedColor = Color(NotesCubit.instance.state.selectedNote.color);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Choose a color'),
+      content: SingleChildScrollView(
+        child: Wrap(
+          children: [
+            for (final color in Colors.primaries)
+              _ColorPickerTile(
+                color: color,
+                selected: selectedColor == color,
+                onTap: () => setState(() => selectedColor = color),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(selectedColor),
+          child: const Text('Save'),
+        ),
+      ],
+    );
+  }
+}
+
+class _ColorPickerTile extends StatelessWidget {
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ColorPickerTile({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: color,
+      shape: selected ? const CircleBorder() : null,
+      child: InkWell(
+        onTap: onTap,
+        child: const SizedBox(
+          width: 48,
+          height: 48,
+        ),
+      ),
+    );
   }
 }

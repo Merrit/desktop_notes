@@ -7,6 +7,9 @@ part 'note.g.dart';
 @freezed
 class Note with _$Note {
   factory Note({
+    /// The color associated with the note.
+    required int color,
+
     /// The note's unique identifier.
     required String id,
 
@@ -19,6 +22,7 @@ class Note with _$Note {
 
   /// Create a new note.
   factory Note.newNote() => Note(
+        color: 0xFF2196F3,
         id: const Uuid().v4(),
         text: '',
         title: '',
