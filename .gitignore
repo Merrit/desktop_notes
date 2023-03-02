@@ -2,6 +2,13 @@
 *.freezed.dart
 *.g.dart
 
+# Generated code
+generated*
+Generated*
+
+# Test coverage
+lcov.info
+
 
 # ---------------------------------------------------------------------------- #
 
