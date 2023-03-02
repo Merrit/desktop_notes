@@ -33,6 +33,19 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
 
   @override
   Widget build(BuildContext context) {
+    final Widget divider = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: SizedBox(
+        width: expanded ? 256 : 64,
+        child: const Divider(
+          height: 1,
+          thickness: 1,
+          indent: 8,
+          endIndent: 8,
+        ),
+      ),
+    );
+
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -62,6 +75,7 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
               );
             },
           ),
+          divider,
           Expanded(
             child: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
