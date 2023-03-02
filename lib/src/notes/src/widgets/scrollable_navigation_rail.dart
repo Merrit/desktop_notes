@@ -48,7 +48,9 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
 
     return Card(
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: (expanded) //
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.center,
         children: [
           IconButton(
             icon: const Icon(Icons.add),
@@ -119,10 +121,12 @@ class _ScrollableNavigationRailState extends State<ScrollableNavigationRail> {
                                           )
                                       : null,
                                 );
+                              } else {
+                                titleWidget = colorCircle;
                               }
 
                               return ListTile(
-                                leading: colorCircle,
+                                leading: (expanded) ? colorCircle : null,
                                 title: titleWidget,
                                 selected: note.id == state.selectedNote.id,
                                 onTap: () {
