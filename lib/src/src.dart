@@ -1,4 +1,5 @@
 export 'app/app.dart';
+export 'core/core.dart';
 export 'logs/logging_manager.dart';
 export 'notes/notes.dart';
 export 'storage/storage.dart';

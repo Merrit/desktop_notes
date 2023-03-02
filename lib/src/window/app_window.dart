@@ -4,9 +4,11 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:window_size/window_size.dart' as window_size;
 
 import '../logs/logging_manager.dart';
 import '../storage/storage_repository.dart';
+import 'models/models.dart';
 
 /// Represents the main window of the app.
 class AppWindow {
@@ -14,11 +16,16 @@ class AppWindow {
 
   AppWindow._() {
     instance = this;
+    _init();
   }
 
-  static Future<AppWindow> init() async {
+  static Future<AppWindow> create() async {
     await windowManager.ensureInitialized();
+    return AppWindow._();
+  }
 
+  /// Initializes the window.
+  Future<void> _init() async {
     const windowOptions = WindowOptions(
       title: 'Desktop Notes',
       size: Size(500, 500),
@@ -29,28 +36,23 @@ class AppWindow {
     await windowManager.waitUntilReadyToShow(
       windowOptions,
       () async {
+        await _restoreWindowSizeAndPosition();
+        await windowManager.setAlwaysOnBottom(true);
+        // We set the window's title bar style to hidden here because
+        // with it only set in the WindowOptions, the title bar sometimes
+        // shows up temporarily when the window is first shown.
+        await windowManager.setTitleBarStyle(TitleBarStyle.hidden);
         await windowManager.show();
       },
     );
-
-    return AppWindow._();
   }
 
   /// Closes the app.
   void close() => exit(0);
 
-  /// Returns if available the last window size and position.
-  Future<Rect?> getSavedWindowSize() async {
-    String? rectJson = await StorageRepository.instance.get('windowSize');
-    if (rectJson == null) return null;
-    log.v('Retrieved saved window info:\n$rectJson');
-    final windowRect = _rectFromJson(rectJson);
-    return windowRect;
-  }
-
   /// Hides the app window.
   Future<void> hide() async {
-    await saveWindowSize();
+    await saveWindowSizeAndPosition();
     await windowManager.hide();
   }
 
@@ -58,49 +60,70 @@ class AppWindow {
     await windowManager.center();
   }
 
-  Future<void> saveWindowSize() async {
-    final windowInfo = await windowManager.getBounds();
-    final rectJson = windowInfo.toJson();
-    log.v('Saving window info:\n$rectJson');
-    await StorageRepository.instance.save(key: 'windowSize', value: rectJson);
+  /// Saves the window's position and size.
+  Future<void> saveWindowSizeAndPosition() async {
+    final frame = await windowManager.getBounds();
+    final screensConfigId = await _getScreensConfigId();
+    final windowInfo = WindowInfo(
+      frame: frame,
+      screensConfigId: screensConfigId,
+    );
+    await StorageRepository.instance.save(
+      key: screensConfigId,
+      value: windowInfo.toJson(),
+      storageArea: 'window',
+    );
   }
 
-  /// Shows the app window.
-  Future<void> show() async {
-    final Rect? savedWindowSize = await getSavedWindowSize();
-    if (savedWindowSize != null) windowManager.setBounds(savedWindowSize);
-    await windowManager.show();
-  }
-}
+  /// Returns the saved window info for the current configuration of screens.
+  ///
+  /// If no saved window info is found, returns null.
+  Future<WindowInfo?> _getSavedWindowInfo() async {
+    final screensConfigId = await _getScreensConfigId();
+    final windowInfoJson = await StorageRepository.instance.get(
+      screensConfigId,
+      storageArea: 'window',
+    );
 
-extension RectHelper on Rect {
-  /// Returns a Map representation of the Rect using the keys: left, top, width,
-  /// height.
-  Map<String, double> toMap() {
-    return {
-      'left': left,
-      'top': top,
-      'width': width,
-      'height': height,
-    };
+    if (windowInfoJson == null) {
+      return null;
+    }
+
+    return WindowInfo.fromJson(Map<String, dynamic>.from(windowInfoJson));
   }
 
-  /// Returns a JSON representation of the Rect.
-  String toJson() => jsonEncode(toMap());
-}
+  /// Returns a unique ID for the current configuration of screens.
+  ///
+  /// We use this ID to save the window's position and size for this specific
+  /// configuration of screens. This way we can restore the window's position
+  /// and size when the user switches back to this configuration of screens.
+  Future<String> _getScreensConfigId() async {
+    final screens = await window_size.getScreenList();
+    final screenFrames = screens.map((s) => s.frame.toString()).toList();
+    return base64.encode(utf8.encode(screenFrames.join()));
+  }
 
-/// Returns a Rect from a Map representation.
-Rect _rectFromMap(Map<String, double> map) {
-  return Rect.fromLTWH(
-    map['left']!,
-    map['top']!,
-    map['width']!,
-    map['height']!,
-  );
-}
+  /// Restores the window's position and size from the saved window info.
+  ///
+  /// If no saved window info is found, the window is centered.
+  Future<void> _restoreWindowSizeAndPosition() async {
+    final savedWindowInfo = await _getSavedWindowInfo();
+    if (savedWindowInfo == null) {
+      await resetPosition();
+      return;
+    }
 
-/// Returns a Rect from a JSON representation.
-Rect _rectFromJson(String json) {
-  final map = jsonDecode(json) as Map<String, dynamic>;
-  return _rectFromMap(map.cast<String, double>());
+    final screensConfigId = await _getScreensConfigId();
+    if (screensConfigId != savedWindowInfo.screensConfigId) {
+      await resetPosition();
+      return;
+    }
+
+    log.i('''
+Restoring window size and position
+top: ${savedWindowInfo.frame.top}, left: ${savedWindowInfo.frame.left}
+width: ${savedWindowInfo.frame.width}, height: ${savedWindowInfo.frame.height}
+screensConfigId: $screensConfigId''');
+    await windowManager.setBounds(savedWindowInfo.frame);
+  }
 }

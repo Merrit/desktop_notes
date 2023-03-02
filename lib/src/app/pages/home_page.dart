@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:tray_manager/tray_manager.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../src.dart';
@@ -13,7 +14,7 @@ class HomePage extends StatefulWidget with WindowListener {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with WindowListener {
+class _HomePageState extends State<HomePage> with TrayListener, WindowListener {
   final focusNode = FocusNode();
 
   @override
@@ -27,12 +28,14 @@ class _HomePageState extends State<HomePage> with WindowListener {
 
   @override
   void initState() {
+    trayManager.addListener(this);
     windowManager.addListener(this);
     super.initState();
   }
 
   @override
   void dispose() {
+    trayManager.removeListener(this);
     windowManager.removeListener(this);
     super.dispose();
   }
@@ -69,7 +72,7 @@ class _CustomAppBarState extends State<_CustomAppBar> {
     return GestureDetector(
       behavior: HitTestBehavior.translucent,
       onPanStart: (_) => windowManager.startDragging(),
-      onTapUp: (_) => AppWindow.instance.saveWindowSize(),
+      onPanEnd: (_) => AppWindow.instance.saveWindowSizeAndPosition(),
       onDoubleTap: () async {
         bool isMaximized = await windowManager.isMaximized();
         if (!isMaximized) {
