@@ -1,8 +1,8 @@
 import 'dart:io';
 
+import 'package:desktop_notes/src/storage/helpers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 
 /// Interfaces with the host OS to store & retrieve data from disk.
 class StorageRepository {
@@ -22,8 +22,7 @@ class StorageRepository {
     // Hive has a bug and initializes its storage for Flutter apps to an
     // incorrect directory on desktop platforms.Initialize to a specific
     // directory.
-    final dir = await getApplicationSupportDirectory();
-    // Defaults to ~/.local/share/<app_name>/storage
+    final dir = await getSupportDirectory();
     hive.init('${dir.path}/storage');
     instance = StorageRepository._(hive);
     return instance;

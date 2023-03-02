@@ -1,8 +1,8 @@
-import 'package:path_provider/path_provider.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 import '../src.dart';
+import 'helpers.dart';
 
 /// Database for [Note]s using sqflite_common_ffi
 class NotesDatabase {
@@ -20,8 +20,8 @@ class NotesDatabase {
   static late final NotesDatabase instance;
 
   static Future<NotesDatabase> init() async {
-    final supportDirectory = await getApplicationSupportDirectory();
-    final path = '${supportDirectory.path}/$_databaseName';
+    final supportDirectory = await getSupportDirectory();
+    final path = '${supportDirectory.path}/database/$_databaseName';
     log.i('Database path: $path');
 
     // open the database
