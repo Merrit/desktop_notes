@@ -11,12 +11,11 @@ class NotesCubit extends Cubit<NotesState> {
 
   NotesCubit() : super(NotesState.initial()) {
     instance = this;
-    init();
+    _init();
   }
 
   /// Initialize the cubit.
-  Future<void> init() async {
-    await NotesDatabase.init();
+  Future<void> _init() async {
     await _loadNotes();
   }
 
@@ -45,7 +44,7 @@ class NotesCubit extends Cubit<NotesState> {
 
     emit(state.copyWith(
       loading: false,
-      notes: notes,
+      notes: notes.sortNotes(),
       selectedNote: selectedNote,
     ));
   }
@@ -73,6 +72,22 @@ class NotesCubit extends Cubit<NotesState> {
   /// Delete all notes from storage.
   Future<void> deleteAll() async {
     await NotesDatabase.instance.deleteAll();
+  }
+
+  /// Reorder the notes.
+  ///
+  /// Updates the index for each note, emits the new state, and saves the notes.
+  Future<void> reorder(int oldIndex, int newIndex) async {
+    final notes = [...state.notes];
+    final note = notes.removeAt(oldIndex);
+    notes.insert(newIndex, note);
+
+    for (var i = 0; i < notes.length; i++) {
+      notes[i] = notes[i].copyWith(index: i);
+    }
+
+    emit(state.copyWith(notes: notes));
+    await NotesDatabase.instance.saveAll(notes);
   }
 
   /// Save a note to storage.

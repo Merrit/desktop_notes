@@ -18,6 +18,7 @@ Future<void> main(List<String> args) async {
   };
 
   await StorageRepository.initialize(Hive);
+  await NotesDatabase.init();
   await AppWindow.create();
 
   final themeCubit = await ThemeCubit.init(StorageRepository.instance);

@@ -15,10 +15,12 @@ class NotesState with _$NotesState {
 
   /// The initial state.
   factory NotesState.initial() {
+    final selectedNote = Note.newNote().copyWith(id: 'loading');
+
     return NotesState(
       loading: true,
       notes: [],
-      selectedNote: Note.newNote(),
+      selectedNote: selectedNote,
     );
   }
 }

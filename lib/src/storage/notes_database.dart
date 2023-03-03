@@ -10,14 +10,21 @@ class NotesDatabase {
   static const _tableName = 'notes';
   static const _columnColor = 'color';
   static const _columnId = 'id';
+  static const _columnIndex = '`index`'; // index is a reserved word
   static const _columnTitle = 'title';
   static const _columnText = 'text';
 
   final Database _db;
 
-  NotesDatabase._(this._db);
+  /// The path to the database file.
+  final String databasePath;
 
-  static late final NotesDatabase instance;
+  const NotesDatabase._(
+    this._db, {
+    required this.databasePath,
+  });
+
+  static late NotesDatabase instance;
 
   static Future<NotesDatabase> init() async {
     final supportDirectory = await getSupportDirectory();
@@ -32,12 +39,17 @@ class NotesDatabase {
 CREATE TABLE IF NOT EXISTS $_tableName (
   $_columnColor INTEGER NOT NULL,
   $_columnId TEXT PRIMARY KEY,
+  $_columnIndex INTEGER NOT NULL,
   $_columnTitle TEXT NOT NULL,
   $_columnText TEXT NOT NULL
 )
 ''');
 
-    instance = NotesDatabase._(database);
+    instance = NotesDatabase._(
+      database,
+      databasePath: path,
+    );
+
     return instance;
   }
 
@@ -63,6 +75,19 @@ CREATE TABLE IF NOT EXISTS $_tableName (
       note.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
+  }
+
+  /// Save all notes.
+  Future<void> saveAll(List<Note> notes) async {
+    final batch = _db.batch();
+    for (final note in notes) {
+      batch.insert(
+        _tableName,
+        note.toJson(),
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
+    await batch.commit();
   }
 
   Future<List<Note>> getAll() async {

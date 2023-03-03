@@ -6,6 +6,9 @@
 generated*
 Generated*
 
+# Temporary test files
+test/tmp/
+
 # Test coverage
 lcov.info
 
