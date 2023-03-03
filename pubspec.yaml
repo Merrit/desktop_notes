@@ -33,6 +33,10 @@ dependencies:
       ref: 6c66ad23ee79749f30a8eece542cf54eaf157ed8
 
 dev_dependencies:
+  flutter_app_builder:
+    git:
+      url: https://github.com/Merrit/flutter_app_builder.git
+      ref: 3c38d05af2ab6355e8c72a6d42ff7ad6c29c9348
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
