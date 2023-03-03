@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
@@ -28,7 +30,9 @@ class NotesDatabase {
 
   static Future<NotesDatabase> init() async {
     final supportDirectory = await getSupportDirectory();
-    final path = '${supportDirectory.path}/database/$_databaseName';
+    final windowsPath = '${supportDirectory.path}\\database\\$_databaseName';
+    final unixPath = '${supportDirectory.path}/database/$_databaseName';
+    final path = Platform.isWindows ? windowsPath : unixPath;
     log.i('Database path: $path');
 
     // open the database
