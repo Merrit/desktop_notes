@@ -35,6 +35,9 @@ class NotesDatabase {
     final path = Platform.isWindows ? windowsPath : unixPath;
     log.i('Database path: $path');
 
+    // init ffi loader if needed
+    sqfliteFfiInit();
+
     // open the database
     final database = await databaseFactoryFfi.openDatabase(path);
 
