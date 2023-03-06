@@ -11,13 +11,14 @@ import 'package:path_provider/path_provider.dart';
 /// For tests this will be in a `test` subdirectory.
 Future<Directory> getSupportDirectory() async {
   final Directory dir = await getApplicationSupportDirectory();
+  final separator = Platform.pathSeparator;
 
   if (kDebugMode) {
-    return Directory('${dir.path}/dev');
+    return Directory('${dir.path}${separator}dev');
   }
 
   if (Platform.environment.containsKey('FLUTTER_TEST')) {
-    return Directory('${dir.path}/test');
+    return Directory('${dir.path}${separator}test');
   }
 
   return dir;
