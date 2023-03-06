@@ -41,6 +41,18 @@ class _HomePageState extends State<HomePage> with TrayListener, WindowListener {
   }
 
   @override
+  void onTrayIconMouseDown() {
+    trayManager.popUpContextMenu();
+    super.onTrayIconMouseDown();
+  }
+
+  @override
+  void onTrayIconRightMouseDown() {
+    trayManager.popUpContextMenu();
+    super.onTrayIconRightMouseDown();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const _CustomAppBar(),
