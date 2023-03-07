@@ -893,10 +893,11 @@ packages:
   window_manager:
     dependency: "direct main"
     description:
-      name: window_manager
-      sha256: "492806c69879f0d28e95472bbe5e8d5940ac8c6e99cc07052fe14946974555ba"
-      url: "https://pub.dev"
-    source: hosted
+      path: "."
+      ref: always_bottom_windows
+      resolved-ref: "0e4a73da15a3258d157898a8450b72171e5c0ed5"
+      url: "https://github.com/Merrit/window_manager.git"
+    source: git
     version: "0.3.1"
   window_size:
     dependency: "direct main"

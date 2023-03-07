@@ -32,6 +32,12 @@ dependencies:
       path: plugins/window_size
       ref: 6c66ad23ee79749f30a8eece542cf54eaf157ed8
 
+dependency_overrides:
+  window_manager:
+    git:
+      url: https://github.com/Merrit/window_manager.git
+      ref: always_bottom_windows
+
 dev_dependencies:
   flutter_app_builder:
     git:
